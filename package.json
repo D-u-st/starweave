@@ -1,0 +1,31 @@
+{
+  "name": "starweave",
+  "version": "0.1.0",
+  "description": "Starweave — lightweight Claude Code messaging bridge. Your AI agent, woven through the stars.",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node start-proxy.js",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "rebuild": "npm run clean && npm run build"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.3.1",
+    "https-proxy-agent": "^7.0.6",
+    "sqlite3": "^5.1.6",
+    "undici": "^6.6.0",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
