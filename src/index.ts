@@ -10,6 +10,7 @@ if (process.env.HTTPS_PROXY || process.env.HTTP_PROXY) {
 
 import { Client, GatewayIntentBits, Events, Message, TextChannel } from 'discord.js';
 import { SessionManager } from './claude/session-manager';
+import { chunkDiscordText } from './utils/chunk';
 import { logger } from './utils/logger';
 import { config, validateConfig } from './config';
 
@@ -27,8 +28,6 @@ const client = new Client({
 });
 
 const sessionManager = new SessionManager();
-
-import { chunkDiscordText } from './utils/chunk';
 
 client.once(Events.ClientReady, async (readyClient) => {
   logger.info(`Logged in as ${readyClient.user.tag}`);

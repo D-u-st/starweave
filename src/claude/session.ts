@@ -1,6 +1,5 @@
 import { EventEmitter } from 'events';
 import { BridgeManager } from './bridge-manager';
-import { OutputParser } from './output-parser';
 import { logger } from '../utils/logger';
 
 export interface ClaudeMessage {
@@ -22,7 +21,6 @@ export class Session extends EventEmitter {
 
   private messages: ClaudeMessage[] = [];
   private processManager: BridgeManager | null = null;
-  private outputParser: OutputParser;
   private lastActivity: number;
 
   constructor(id: string, userId: string, channelId: string) {
@@ -32,7 +30,6 @@ export class Session extends EventEmitter {
     this.channelId = channelId;
     this.createdAt = Date.now();
     this.lastActivity = Date.now();
-    this.outputParser = new OutputParser();
   }
 
   async initialize(): Promise<void> {
@@ -41,15 +38,15 @@ export class Session extends EventEmitter {
       await this.processManager.initialize();
 
       this.processManager.on('output', (data: string) => {
-        const parsed = this.outputParser.parse(data);
+        const content = data.replace(/\n{3,}/g, '\n\n').replace(/^\s+|\s+$/g, '').replace(/\t/g, '  ');
         const msg: ClaudeMessage = {
           role: 'assistant',
-          content: parsed.content,
+          content,
           timestamp: Date.now(),
           id: this.generateMessageId()
         };
         this.messages.push(msg);
-        this.emit('output', parsed.type, parsed.content);
+        this.emit('output', 'response', content);
       });
 
       this.processManager.on('error', (error: Error) => {
