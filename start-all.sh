@@ -11,9 +11,11 @@ node -e "const db=require('better-sqlite3')('data/sessions.db');db.exec('DELETE 
 # Start bot in background window
 tmux new-session -d -s "$SESSION" -n "queeny" "cd ~/starweave && node start-proxy.js"
 
-# Open main window - user types claude themselves
-# When this shell exits (window closed), kill entire session including bot
-tmux new-window -t "$SESSION" -n "claude" "cd ~ && bash; tmux kill-session -t $SESSION"
+# Open main window
+tmux new-window -t "$SESSION" -n "claude" "cd ~ && bash"
+
+# When claude window is destroyed, kill entire session (including bot)
+tmux set-hook -t "$SESSION" window-unlinked "if [ #{session_windows} -le 1 ]; then kill-session -t $SESSION; fi"
 
 # Show the shell window
 tmux select-window -t "$SESSION:claude"
