@@ -2,7 +2,7 @@
 
 Lightweight Claude Code messaging bridge. Control Claude Code from your phone via Discord.
 
-**841 lines of TypeScript. 6 dependencies. Zero bloat.**
+**899 lines of TypeScript. 7 files. 6 dependencies. Zero bloat.**
 
 ## What it does
 
@@ -17,7 +17,13 @@ Send a message to your Discord bot, it gets forwarded to your running Claude Cod
 - Use your Claude Max subscription (not API) — no per-token costs
 - See the full Claude Code session in tmux when you're at your desk
 - Continue conversations seamlessly between phone and desktop
-- 841 lines vs OpenClaw's 1.7M lines for the same core functionality
+- 899 lines vs OpenClaw's 1.7M lines for the same core functionality
+
+## Prerequisites
+
+- Node.js >= 18
+- tmux
+- Claude Code CLI (installed and logged in)
 
 ## Quick Start
 
@@ -29,7 +35,7 @@ npm run build
 cp .env.example .env  # Fill in your Discord bot token
 ```
 
-### Setup
+### Discord Bot Setup
 
 1. Create a Discord bot at [discord.com/developers](https://discord.com/developers/applications)
 2. Enable **Message Content Intent** in bot settings
@@ -58,26 +64,39 @@ claude
 node start-proxy.js
 ```
 
-### Usage
+### Windows Terminal Integration
 
-In Discord, mention the bot:
+Add a profile in Windows Terminal settings for one-click launch:
+```json
+{
+  "name": "Starweave",
+  "commandline": "wsl bash -c \"bash ~/starweave/start-all.sh\"",
+  "icon": "✨"
+}
+```
+
+## Commands
+
+In Discord, mention the bot to send messages:
 ```
 @Starweave write a Python HTTP server with /time and /health endpoints
 ```
 
-The message gets sent to Claude Code. When Claude finishes, the response appears in Discord.
+Built-in commands:
+- `@Starweave /stop` — shut down the bot
+- `@Starweave /status` — show current session info
 
 ## Architecture
 
 | File | Lines | Purpose |
 |------|-------|---------|
-| `src/index.ts` | 125 | Discord client + message handler |
-| `src/claude/bridge-manager.ts` | 165 | tmux interaction + output capture |
-| `src/claude/session-manager.ts` | 224 | Session persistence (SQLite) |
-| `src/claude/session.ts` | 129 | Session lifecycle |
-| `src/claude/output-parser.ts` | 54 | Format output for Discord |
-| `src/config.ts` | 67 | Config loading |
-| `src/utils/logger.ts` | 77 | Logging |
+| `src/index.ts` | 120 | Discord client, message handler, commands |
+| `src/claude/bridge-manager.ts` | 165 | tmux interaction, idle detection, output extraction |
+| `src/claude/session-manager.ts` | 190 | Session CRUD, SQLite persistence (better-sqlite3) |
+| `src/claude/session.ts` | 126 | Session lifecycle, EventEmitter |
+| `src/utils/chunk.ts` | 154 | Fence-aware Discord message splitting |
+| `src/config.ts` | 67 | Environment variable loading |
+| `src/utils/logger.ts` | 77 | Winston logger with daily rotation |
 
 ## How it works
 
@@ -88,6 +107,7 @@ The message gets sent to Claude Code. When Claude finishes, the response appears
 5. Output captured by polling `tmux capture-pane` every 800ms
 6. Waits for Claude to finish (idle detection + screen stability check)
 7. Extracts Claude's response, filters UI noise, sends to Discord
+8. Long responses are split with code-fence awareness (no broken code blocks)
 
 ## Proxy Support
 
