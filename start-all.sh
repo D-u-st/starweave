@@ -14,8 +14,8 @@ tmux new-session -d -s "$SESSION" -n "queeny" "cd ~/starweave && node start-prox
 # Open main window
 tmux new-window -t "$SESSION" -n "claude" "cd ~ && bash"
 
-# When claude window is destroyed, kill entire session (including bot)
-tmux set-hook -t "$SESSION" window-unlinked "if [ #{session_windows} -le 1 ]; then kill-session -t $SESSION; fi"
+# Kill entire session when client detaches (i.e. terminal tab closed)
+tmux set-option -t "$SESSION" destroy-unattached on
 
 # Show the shell window
 tmux select-window -t "$SESSION:claude"
