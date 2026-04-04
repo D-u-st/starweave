@@ -2,7 +2,7 @@
 
 Lightweight Claude Code messaging bridge. Control Claude Code from your phone via Discord.
 
-**899 lines of TypeScript. 7 files. 6 dependencies. Zero bloat.**
+**~900 lines of TypeScript. 7 files. 6 dependencies. Zero bloat.**
 
 ## What it does
 
@@ -17,7 +17,7 @@ Send a message to your Discord bot, it gets forwarded to your running Claude Cod
 - Use your Claude Max subscription (not API) — no per-token costs
 - See the full Claude Code session in tmux when you're at your desk
 - Continue conversations seamlessly between phone and desktop
-- 899 lines vs OpenClaw's 1.7M lines for the same core functionality
+- ~900 lines vs OpenClaw's 1.7M lines for the same core functionality
 
 ## Prerequisites
 
