@@ -1,6 +1,4 @@
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+// dotenv is loaded in index.ts before this module is imported
 
 interface Config {
   discord: {

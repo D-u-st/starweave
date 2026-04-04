@@ -35,6 +35,11 @@ export class BridgeManager extends EventEmitter {
   private monitoring: boolean = false;
   private waitingForResponse: boolean = false;
   private screenBefore: string = '';
+  private sendTimestamp: number = 0;
+  private lastScreenHash: string = '';
+  private stableCount: number = 0;
+  private readonly MIN_RESPONSE_WAIT_MS = 5000;
+  private readonly STABLE_CHECKS_NEEDED = 3;
 
   constructor(_sessionId: string) {
     super();
@@ -131,12 +136,6 @@ export class BridgeManager extends EventEmitter {
       }
     }, 800);
   }
-
-  private sendTimestamp: number = 0;
-  private lastScreenHash: string = '';
-  private stableCount: number = 0;
-  private readonly MIN_RESPONSE_WAIT_MS = 5000; // wait at least 5s before checking
-  private readonly STABLE_CHECKS_NEEDED = 3; // screen must be unchanged for 3 consecutive checks (~2.4s)
 
   async sendInput(input: string): Promise<void> {
     this.screenBefore = await this.captureScreen(); // snapshot before sending
