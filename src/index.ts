@@ -28,17 +28,7 @@ const client = new Client({
 
 const sessionManager = new SessionManager();
 
-// Split long responses into <=2000 char chunks
-function splitMessage(text: string, maxLen = 2000): string[] {
-  if (text.length <= maxLen) return [text];
-  const chunks: string[] = [];
-  let start = 0;
-  while (start < text.length) {
-    chunks.push(text.slice(start, start + maxLen));
-    start += maxLen;
-  }
-  return chunks;
-}
+import { chunkDiscordText } from './utils/chunk';
 
 client.once(Events.ClientReady, async (readyClient) => {
   logger.info(`Logged in as ${readyClient.user.tag}`);
@@ -64,6 +54,8 @@ client.on(Events.MessageCreate, async (message: Message) => {
 
   const channel = message.channel as TextChannel;
 
+  let typingInterval: ReturnType<typeof setInterval> | null = null;
+
   try {
     // Get or create session for this channel
     const session = await sessionManager.getOrCreateSession(
@@ -71,7 +63,8 @@ client.on(Events.MessageCreate, async (message: Message) => {
       message.channelId
     );
 
-    // Show typing while waiting
+    // Show typing continuously until response
+    typingInterval = setInterval(() => { channel.sendTyping().catch(() => {}); }, 4000);
     await channel.sendTyping();
 
     // One-shot listener: capture next output event from this session
@@ -85,7 +78,7 @@ client.on(Events.MessageCreate, async (message: Message) => {
     await session.sendMessage(content);
 
     // Wait for response (with timeout)
-    const timeoutMs = 120_000;
+    const timeoutMs = 1_800_000; // 30 minutes
     const result = await Promise.race([
       responsePromise,
       new Promise<{ type: string; content: string }>((_, reject) =>
@@ -93,12 +86,15 @@ client.on(Events.MessageCreate, async (message: Message) => {
       )
     ]);
 
-    const chunks = splitMessage(result.content);
+    clearInterval(typingInterval);
+
+    const chunks = chunkDiscordText(result.content);
     for (const chunk of chunks) {
       await channel.send(chunk);
     }
 
   } catch (error: any) {
+    if (typingInterval) clearInterval(typingInterval);
     logger.error('Error handling message:', error);
     await channel.send(`Error: ${error.message}`);
   }

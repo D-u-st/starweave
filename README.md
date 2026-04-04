@@ -22,7 +22,7 @@ Send a message to your Discord bot, it gets forwarded to your running Claude Cod
 ## Quick Start
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/starweave.git
+git clone https://github.com/D-u-st/starweave.git
 cd starweave
 npm install
 npm run build
