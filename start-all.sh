@@ -14,9 +14,8 @@ tmux new-session -d -s "$SESSION" -n "queeny" "cd ~/starweave && node start-prox
 # Open main window
 tmux new-window -t "$SESSION" -n "claude" "cd ~ && bash"
 
-# Kill entire session when client detaches (i.e. terminal tab closed)
-tmux set-option -t "$SESSION" destroy-unattached on
-
 # Show the shell window
 tmux select-window -t "$SESSION:claude"
-tmux attach -t "$SESSION"
+
+# Attach first, THEN set destroy-unattached (so it doesn't die before we connect)
+tmux attach -t "$SESSION" \; set-option destroy-unattached on
