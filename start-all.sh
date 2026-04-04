@@ -11,11 +11,10 @@ node -e "const db=require('better-sqlite3')('data/sessions.db');db.exec('DELETE 
 # Start bot in background window
 tmux new-session -d -s "$SESSION" -n "queeny" "cd ~/starweave && node start-proxy.js"
 
-# Open main window
-tmux new-window -t "$SESSION" -n "claude" "cd ~ && bash"
+# Open main window - user types claude themselves
+# When this shell exits (window closed), kill entire session including bot
+tmux new-window -t "$SESSION" -n "claude" "cd ~ && bash; tmux kill-session -t $SESSION"
 
 # Show the shell window
 tmux select-window -t "$SESSION:claude"
-
-# Attach first, THEN set destroy-unattached (so it doesn't die before we connect)
-tmux attach -t "$SESSION" \; set-option destroy-unattached on
+tmux attach -t "$SESSION"
