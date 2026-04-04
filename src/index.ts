@@ -53,6 +53,25 @@ client.on(Events.MessageCreate, async (message: Message) => {
 
   const channel = message.channel as TextChannel;
 
+  // Commands
+  if (content === '/stop') {
+    await channel.send('Starweave shutting down.');
+    await sessionManager.saveAllSessions();
+    await client.destroy();
+    process.exit(0);
+  }
+
+  if (content === '/status') {
+    const session = sessionManager.getSessionByChannel(message.channelId);
+    if (session) {
+      const info = session.getInfo() as any;
+      await channel.send(`Session: ${info.id}\nMessages: ${info.messageCount}\nSince: ${info.createdAt}`);
+    } else {
+      await channel.send('No active session for this channel.');
+    }
+    return;
+  }
+
   let typingInterval: ReturnType<typeof setInterval> | null = null;
 
   try {
